@@ -11,6 +11,27 @@ module.exports = {
     this.ObjectId = ObjectId;
   },
 
+  /*
+  {
+    "key": unique key
+  }
+  */
+  auth: (req, res) => {
+    if (!req.body.key) {
+      res.status(406).send('No key provided');
+      return;
+    }
+
+    if (req.body.key === process.env.SUPER_SECRET_USER_KEY) {
+      res.status(200).send({
+        "api_key": process.env.SUPER_SECRET_API_KEY
+      });
+      return;
+    }
+
+    res.status(403).send('Incorrect key');
+  },
+
   getAllComments: (req, res) => {
     const cursor = this.commentCollection.find();
     cursor.toArray()

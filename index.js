@@ -13,7 +13,21 @@ db.connect()
     });
     
     routes.forEach(route => {
-      app[route.method](route.url, route.handler);
+      app[route.method](route.url, (req, res) => {
+        if (route.protected) {
+          if (!req.headers.authorization) {
+            res.status(406).send('No authorization provided');
+            return;
+          }
+      
+          if (req.headers.authorization !== process.env.SUPER_SECRET_API_KEY) {
+            res.status(403).send('Incorrect API key');
+            return;
+          }
+        }
+
+        route.handler(req, res);
+      });
     });
   })
   .catch(err => {

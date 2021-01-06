@@ -2,19 +2,21 @@ const api = require('./api');
 
 // [ 'method', 'url', function' ]
 const routes = [
-  [ 'get', '/comments', api.getAllComments ],
-  [ 'get', '/mod', api.getUnpublishedComments ],
-  [ 'get', '/comments/:path(*)', api.getCommentByPath ],
-  [ 'post', '/comment', api.postNewComment ],
-  [ 'put', '/publish', api.publishComment ],
-  [ 'put', '/unpublish', api.unpublishComment ],
-  [ 'put', '/comment', api.updateComment ],
+  [ 'post', '/auth', api.auth, false ],
+  [ 'get', '/comments', api.getAllComments, true ],
+  [ 'get', '/mod', api.getUnpublishedComments, true ],
+  [ 'get', '/comments/:path(*)', api.getCommentByPath, false ],
+  [ 'post', '/comment', api.postNewComment, false ],
+  [ 'put', '/publish', api.publishComment, true ],
+  [ 'put', '/unpublish', api.unpublishComment, true ],
+  [ 'put', '/comment', api.updateComment, true ],
 ]
 
 module.exports = routes.map(route => { 
   return { 
     method: route[0], 
     url: route[1], 
-    handler: route[2] 
+    handler: route[2],
+    protected: route[3]
   } 
 });
