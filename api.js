@@ -38,16 +38,6 @@ module.exports = {
       .then(data => res.send(data));
   },
 
-  getUnpublishedComments: (req, res) => {      
-    const cursor = this.commentCollection.find(
-      {
-        published: false
-      }
-    );
-    cursor.toArray()
-      .then(data => res.send(data));
-  },
-
   getCommentByPath: (req, res) => {
     if (!req.params.path) {
       res.status(406);
@@ -56,7 +46,7 @@ module.exports = {
     
     const cursor = this.commentCollection.find(
       {
-        path: req.params.path,
+        path: encodeURIComponent(req.params.path),
         published: true
       }
     );
@@ -74,7 +64,10 @@ module.exports = {
   }
   */
   postNewComment: (req, res) => {
-    if (!req.body.path || !req.body.name || !req.body.email || !req.body.title || !req.body.body) res.status(406).send('Missing data');
+    if (!req.body.path || !req.body.name || !req.body.email || !req.body.title || !req.body.body) {
+      res.status(406).send('Missing data');
+      return;
+    }
 
     const data = req.body;
     data.published = false;
@@ -116,7 +109,10 @@ module.exports = {
   }
   */
   unpublishComment: (req, res) => {
-    if (!req.body.id) res.status(406).send('Missing data');
+    if (!req.body.id) {
+      res.status(406).send('Missing data');
+      return;
+    }
 
     this.commentCollection.findOneAndUpdate(
       {
@@ -178,6 +174,27 @@ module.exports = {
       {}
     )
       .then(result => res.send('Success'))
+      .catch(error => console.error(error));
+  },
+
+  deleteComment: (req, res) => {
+    if (!req.body.id) {
+      res.status(406).send('Missing data');
+      return;
+    }
+
+    this.commentCollection.deleteOne(
+      {
+        _id: this.ObjectId(req.body.id)
+      },
+      {
+        $set: {
+          published: false
+        }
+      },
+      {}
+    )
+      .then(result => res.status(200).send('Success'))
       .catch(error => console.error(error));
   }
 }
