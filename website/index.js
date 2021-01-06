@@ -27,6 +27,7 @@ const buildComment = (data) => {
 
 const addDelListener = (el) => {
   el.addEventListener('click', () => {
+    if (!confirm('Are you sure?')) return;
     fetch('/comment', {
       method: 'DELETE',
       headers: {
@@ -68,6 +69,10 @@ const populateTable = (tableEl, tableData) => {
 
   Array.from(tbody.querySelectorAll(".pub-button")).forEach(el => {
     addPublishListener(el);
+  })
+
+  Array.from(tbody.querySelectorAll(".del-button")).forEach(el => {
+    addDelListener(el);
   })
 }
 
