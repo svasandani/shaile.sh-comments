@@ -8,8 +8,8 @@ db.connect()
   .then(client => {
     console.log('Database connection established.');
 
-    app.listen(3000, () => {
-      console.log('listening on 3000');
+    app.listen(process.env.PORT || 3000, () => {
+      console.log(`listening on ${process.env.PORT || 3000}`);
     });
     
     routes.forEach(route => {
