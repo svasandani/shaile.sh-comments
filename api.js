@@ -220,9 +220,7 @@ module.exports = {
       replyTo: req.body.replyTo
     }
 
-    const params = {
-      published: false
-    };
+    const params = {};
 
     Object.keys(oldParams).forEach(key => {
       if (key in req.body) params[key] = oldParams[key];
