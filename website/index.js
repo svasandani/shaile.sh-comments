@@ -12,6 +12,8 @@ const buildComment = (data) => {
   <td>${data.email}</td>
   <td>${data.title}</td>
   <td>${data.body}</td>
+  <td>${data.replyTo}</td>
+  <td>${data.date}</td>
   <td class="button-col">
     <div class="input-group">
       <button type="button" class="btn btn-primary pub-button" data-id="${data._id}" data-action="${data.published ? `unpublish"> Unpublish` : `publish"> Publish`}

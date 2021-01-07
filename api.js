@@ -60,17 +60,20 @@ module.exports = {
     "name": name of commenter,
     "email": email of commenter,
     "title": title of comment,
-    "body": body of comment
+    "body": body of comment,
+    "replyTo": parent comment,
+    "date": date of comment (ISO string)
   }
   */
   postNewComment: (req, res) => {
-    if (!req.body.path || !req.body.name || !req.body.email || !req.body.title || !req.body.body) {
+    if (!req.body.path || !req.body.name || !req.body.email || !req.body.title || !req.body.body || !req.body.date) {
       res.status(406).send('Missing data');
       return;
     }
 
     const data = req.body;
     data.published = false;
+    if (!req.body.replyTo) req.body.replyTo = "";
 
     this.commentCollection.insertOne(req.body)
       .then(result => {
