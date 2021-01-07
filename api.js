@@ -1,3 +1,6 @@
+const nodemailer = require("nodemailer");
+const templates = require('./templates');
+
 module.exports = {
   db: null,
 
@@ -5,10 +8,22 @@ module.exports = {
 
   ObjectId: null,
 
+  transporter: null,
+
   init: (client, ObjectId) => {
     this.db = client.db('comments');
     this.commentCollection = this.db.collection('comments');
     this.ObjectId = ObjectId;
+
+    this.transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS
+      }
+    });
   },
 
   /*
@@ -30,6 +45,10 @@ module.exports = {
     }
 
     res.status(403).send('Incorrect key');
+  },
+
+  testEmail: (req, res) => {
+    
   },
 
   getAllComments: (req, res) => {
@@ -76,8 +95,7 @@ module.exports = {
     if (!req.body.replyTo) req.body.replyTo = "";
 
     this.commentCollection.insertOne(req.body)
-      .then(result => {
-      })
+      .then(result => {})
       .catch(error => console.error(error));
     
     res.status(200).send('Success');
@@ -102,7 +120,46 @@ module.exports = {
       },
       {}
     )
-      .then(result => res.status(200).send('Success'))
+      .then(result => {
+
+        const newCursor = this.commentCollection.find(
+          {
+            _id: this.ObjectId(req.body.id)
+          }
+        );
+
+        newCursor.toArray()
+            .then(data => {
+              let newComment = data[0];
+
+              if (newComment.replyTo) {
+                const repliedCursor = this.commentCollection.find(
+                  {
+                    _id: this.ObjectId(newComment.replyTo)
+                  }
+                );
+      
+                repliedCursor.toArray()
+                  .then(repliedData => {
+                    let repliedComment = repliedData[0];
+      
+                    this.transporter.sendMail({
+                      from: '"Shailesh Codes" <blog@shaile.sh>',
+                      to: repliedComment.email,
+                      subject: "Someone replied to your comment!",
+                      text: templates.newCommentText(repliedComment, newComment),
+                      html: templates.newCommentHTML(repliedComment, newComment)
+                    })
+                      .then(info => console.log(`Mail sent! Id: ${info.messageId}`))
+                      .catch(err => {
+                        console.error('Something went wrong...', err)
+                      });
+                  })
+              }
+
+              res.status(200).send('Success') 
+            })
+      })
       .catch(error => console.error(error));
   },
 
