@@ -225,7 +225,7 @@ module.exports = {
     };
 
     Object.keys(oldParams).forEach(key => {
-      if (oldParams[key]) params[key] = oldParams[key];
+      if (key in req.body) params[key] = oldParams[key];
     });
 
     this.commentCollection.findOneAndUpdate(
