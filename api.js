@@ -215,14 +215,18 @@ module.exports = {
       name: req.body.name,
       email: req.body.email,
       title: req.body.title,
-      body: req.body.body
+      body: req.body.body,
+      date: req.body.date,
+      replyTo: req.body.replyTo
     }
 
-    const params = {};
+    const params = {
+      published: false
+    };
 
     Object.keys(oldParams).forEach(key => {
       if (oldParams[key]) params[key] = oldParams[key];
-    })
+    });
 
     this.commentCollection.findOneAndUpdate(
       {
