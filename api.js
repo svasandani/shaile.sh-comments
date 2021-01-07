@@ -151,8 +151,8 @@ module.exports = {
                       html: templates.newCommentHTML(repliedComment, newComment)
                     })
                       .then(info => console.log(`Mail sent! Id: ${info.messageId}`))
-                      .catch(err => {
-                        console.error('Something went wrong...', err)
+                      .catch(error => {
+                        console.error(error)
                       });
                   })
               }
